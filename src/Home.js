@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
-import JsonStore from "./JsonStore";
-import ApiGateway from "./ApiGateway";
+import JsonStore from "./JsonStore"
+import ApiGateway from "./ApiGateway"
+import _ from 'lodash'
 
 class Home extends Component {
 
@@ -20,11 +21,11 @@ class Home extends Component {
 
     this.handleAPIKeyChange = this.handleAPIKeyChange.bind(this)
     this.handleEmailChange = this.handleEmailChange.bind(this)
-    this.handleIPAddressChange = this.handleIPAddressChange.bind(this)
+    this.handleIPAddressesChange = this.handleIPAddressesChange.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
     this.getZones = this.getZones.bind(this)
     this.getRules = this.getRules.bind(this)
-    this.addRule = this.addRule.bind(this)
+    this.addRules = this.addRules.bind(this)
     this.selectZone = this.selectZone.bind(this)
     this.initApi = this.initApi.bind(this)
   }
@@ -57,9 +58,9 @@ class Home extends Component {
     this.jsonStore.set('config', this.state)
   }
 
-  handleIPAddressChange(event) {
+  handleIPAddressesChange(event) {
     this.setState({
-      'ipAddress': event.target.value,
+      'ipAddresses': event.target.value,
     })
   }
 
@@ -103,17 +104,19 @@ class Home extends Component {
     })
   }
 
-  addRule() {
-    let body = {
-      configuration: {
-        target: 'ip',
-        value: this.state.ipAddress
-      },
-      notes: this.state.notes,
-      mode: 'block'
-    }
-    ApiGateway.addRule(body, this.state.zone.id).then(() => {
-      this.getRules()
+  addRules() {
+    let notes = this.state.notes
+    let ipAddresses = this.state.ipAddresses.split("\n")
+    ipAddresses.map((ipAddress) => {
+      let body = {
+        configuration: {
+          target: 'ip',
+          value: ipAddress
+        },
+        notes: notes,
+        mode: 'block'
+      }
+      ApiGateway.addRule(body, this.state.zone.id)
     })
   }
 
@@ -139,7 +142,9 @@ class Home extends Component {
           <i className="fa fa-gavel padding-10"></i>
           Cloudflare Blacklister
         </h2>
-        <p>Dump blacklisted ip addresses with a tag for any of your zones.</p>
+        <p>
+          Dump blacklisted ip addresses with a tag for any of your zones.
+        </p>
         <div className="inline-block width-200 padding-10">
           <div className="padding-10">
             <div>
@@ -183,7 +188,9 @@ class Home extends Component {
               IP Addresses:
             </div>
             <div className="padding-10">
-              <textarea className="padding-10 width-120 height-200" type="text" onBlur={this.handleIPAddressChange}/>
+              <textarea className="padding-10 width-120 height-200"
+                        type="text"
+                        onBlur={this.handleIPAddressesChange}/>
             </div>
           </div>
           <div>
@@ -191,11 +198,16 @@ class Home extends Component {
               Tag:
             </div>
             <div className="padding-10">
-              <input className="padding-10" type="text" onBlur={this.handleNotesChange}/>
+              <input className="padding-10"
+                     type="text"
+                     onBlur={this.handleNotesChange}/>
             </div>
           </div>
           <div className="padding-10">
-            <button className="padding-10" onClick={this.addRule}>Apply to {this.state.zone.name}</button>
+            <button className="padding-10"
+                    onClick={this.addRules}>
+              Apply to {this.state.zone.name}
+            </button>
           </div>
         </div>
         <div className="inline-block padding-10">
