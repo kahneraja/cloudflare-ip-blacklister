@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import JsonStore from "./JsonStore"
 import ApiGateway from "./ApiGateway"
 import _ from 'lodash'
-import Spinner from "./Spinner";
 
 class Home extends Component {
 
@@ -32,7 +31,6 @@ class Home extends Component {
     this.deleteRuleGroup = this.deleteRuleGroup.bind(this)
     this.selectZone = this.selectZone.bind(this)
     this.initApi = this.initApi.bind(this)
-    this.onSpinnerComplete = this.onSpinnerComplete.bind(this)
   }
 
   componentWillMount() {
@@ -92,7 +90,6 @@ class Home extends Component {
 
   getZones() {
     this.reset()
-    this.startSpinner()
     ApiGateway.getZones().then(response => {
       response.json().then((data) => {
         if (data) {
@@ -104,14 +101,11 @@ class Home extends Component {
           this.getRules()
         }
       })
-      this.stopSpinner()
     })
   }
 
   getRules() {
-    this.startSpinner()
     ApiGateway.getRules(this.state.zone.id).then(response => {
-      this.stopSpinner()
       response.json().then((data) => {
         this.setState({rules: data})
         let groupSet = _.groupBy(data, (rule) => {
@@ -153,9 +147,9 @@ class Home extends Component {
       notes: notes,
       mode: 'block'
     }
-    this.startSpinner()
-    ApiGateway.addRule(body, this.state.zone.id).then(() => {
-      this.stopSpinner()
+    ApiGateway.addRule(body, this.state.zone.id).then((response) => {
+      response.json().then(() => {
+      })
     })
   }
 
@@ -164,28 +158,14 @@ class Home extends Component {
     rules.map((rule) => {
       this.deleteRule(rule)
     })
+    this.getRules()
   }
 
   deleteRule(rule) {
-    this.startSpinner()
-    ApiGateway.deleteRule(rule.id, this.state.zone.id).then(() => {
-      this.stopSpinner()
-      this.getRules()
+    ApiGateway.deleteRule(rule.id, this.state.zone.id).then((response) => {
+      response.json().then(() => {
+      })
     })
-
-  }
-
-  startSpinner() {
-    this.setState({'activeRequests': this.state.activeRequests + 1})
-  }
-
-  stopSpinner() {
-    if (this.state.activeRequests > 0)
-      this.setState({'activeRequests': this.state.activeRequests - 1})
-  }
-
-  onSpinnerComplete() {
-    console.log('complete!')
   }
 
   render() {
@@ -302,7 +282,6 @@ class Home extends Component {
             </div>
           </div>
         </div>
-        <Spinner activeRequests={this.state.activeRequests} onComplete={this.onSpinnerComplete}></Spinner>
       </div>
     );
   }

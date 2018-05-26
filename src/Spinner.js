@@ -3,10 +3,6 @@ import React, {Component} from 'react'
 class Spinner extends Component {
 
   render() {
-    if (this.props.activeRequests === 0){
-
-    }
-
     let show = () => {
       if (this.props.activeRequests > 0) {
         return (
