@@ -33,6 +33,17 @@ let ApiGateway = {
     )
   },
 
+  deleteRule: (ruleId, zoneId) => {
+    let url = `http://localhost:3000/rules/${ruleId}`
+    let headers = ApiGateway.headers()
+    headers['ZONE_ID'] = zoneId
+    return fetch(url, {
+        method: 'DELETE',
+        headers: headers
+      }
+    )
+  },
+
   headers: () => {
     let jsonStore = new JsonStore()
     return {

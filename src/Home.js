@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import JsonStore from "./JsonStore"
 import ApiGateway from "./ApiGateway"
 import _ from 'lodash'
+import Spinner from "./Spinner";
 
 class Home extends Component {
 
@@ -13,7 +14,9 @@ class Home extends Component {
     zone: {},
     zones: [],
     rules: [],
-    ipAddresses: [],
+    ipAddresses: '',
+    groups: [],
+    activeRequests: 0
   }
 
   constructor(props) {
@@ -26,8 +29,10 @@ class Home extends Component {
     this.getZones = this.getZones.bind(this)
     this.getRules = this.getRules.bind(this)
     this.addRules = this.addRules.bind(this)
+    this.deleteRuleGroup = this.deleteRuleGroup.bind(this)
     this.selectZone = this.selectZone.bind(this)
     this.initApi = this.initApi.bind(this)
+    this.onSpinnerComplete = this.onSpinnerComplete.bind(this)
   }
 
   componentWillMount() {
@@ -76,12 +81,18 @@ class Home extends Component {
     })
   }
 
-  getZones() {
+  reset() {
     this.setState({
       zone: {},
       zones: [],
-      rules: []
+      rules: [],
+      groups: []
     })
+  }
+
+  getZones() {
+    this.reset()
+    this.startSpinner()
     ApiGateway.getZones().then(response => {
       response.json().then((data) => {
         if (data) {
@@ -93,13 +104,29 @@ class Home extends Component {
           this.getRules()
         }
       })
+      this.stopSpinner()
     })
   }
 
   getRules() {
+    this.startSpinner()
     ApiGateway.getRules(this.state.zone.id).then(response => {
+      this.stopSpinner()
       response.json().then((data) => {
         this.setState({rules: data})
+        let groupSet = _.groupBy(data, (rule) => {
+          return rule.notes
+        });
+
+        let groups = []
+        _.forOwn(groupSet, function (value, key) {
+          let group = {
+            name: key,
+            size: value.length
+          }
+          groups.push(group)
+        })
+        this.setState({groups: groups})
       })
     })
   }
@@ -108,16 +135,57 @@ class Home extends Component {
     let notes = this.state.notes
     let ipAddresses = this.state.ipAddresses.split("\n")
     ipAddresses.map((ipAddress) => {
-      let body = {
-        configuration: {
-          target: 'ip',
-          value: ipAddress
-        },
-        notes: notes,
-        mode: 'block'
-      }
-      ApiGateway.addRule(body, this.state.zone.id)
+      this.addRule(ipAddress, notes)
     })
+    this.setState({
+      'ipAddresses': '',
+      'notes': '#'
+    })
+    this.getRules()
+  }
+
+  addRule(ipAddress, notes) {
+    let body = {
+      configuration: {
+        target: 'ip',
+        value: ipAddress
+      },
+      notes: notes,
+      mode: 'block'
+    }
+    this.startSpinner()
+    ApiGateway.addRule(body, this.state.zone.id).then(() => {
+      this.stopSpinner()
+    })
+  }
+
+  deleteRuleGroup(group) {
+    let rules = _.filter(this.state.rules, {notes: group.name});
+    rules.map((rule) => {
+      this.deleteRule(rule)
+    })
+  }
+
+  deleteRule(rule) {
+    this.startSpinner()
+    ApiGateway.deleteRule(rule.id, this.state.zone.id).then(() => {
+      this.stopSpinner()
+      this.getRules()
+    })
+
+  }
+
+  startSpinner() {
+    this.setState({'activeRequests': this.state.activeRequests + 1})
+  }
+
+  stopSpinner() {
+    if (this.state.activeRequests > 0)
+      this.setState({'activeRequests': this.state.activeRequests - 1})
+  }
+
+  onSpinnerComplete() {
+    console.log('complete!')
   }
 
   render() {
@@ -129,10 +197,20 @@ class Home extends Component {
       </div>
     )
 
-    let ruleItems = this.state.rules.map((rule) =>
-      <div key={rule.id}
-           className="padding-10">
-        {rule.configuration.value} {rule.notes}
+    let groupItems = this.state.groups.map((group, index) =>
+      <div key={index}>
+        <div className="padding-2 margin-2 inline-block width-100">
+          {group.name}
+        </div>
+        <div
+          className="padding-2 margin-2 inline-block padding-5 font-size-small font-color-white bg-color-red width-30 center">
+          {group.size}
+        </div>
+        <div className="padding-2 margin-2 inline-block padding-5">
+          <i className="fa fa-times" aria-hidden="true" onClick={() => {
+            this.deleteRuleGroup(group)
+          }}></i>
+        </div>
       </div>
     )
 
@@ -145,7 +223,7 @@ class Home extends Component {
         <p>
           Dump blacklisted ip addresses with a tag for any of your zones.
         </p>
-        <div className="inline-block width-200 padding-10">
+        <div className="inline-block width-200">
           <div>
             <div>
               <h3>API</h3>
@@ -182,44 +260,50 @@ class Home extends Component {
             </div>
           </div>
         </div>
-        <div className="inline-block padding-10">
-          <div className="padding-10">
-            <div className="padding-10 width-100">
-              IP Addresses:
-            </div>
-            <div className="padding-10">
-              <textarea className="padding-10 width-120 height-200"
-                        type="text"
-                        onBlur={this.handleIPAddressesChange}/>
-            </div>
-          </div>
-          <div>
-            <div className="padding-10 width-100">
-              Tag:
-            </div>
-            <div className="padding-10">
-              <input className="padding-10"
-                     type="text"
-                     onBlur={this.handleNotesChange}/>
-            </div>
-          </div>
-          <div className="padding-10">
-            <button className="padding-10"
-                    onClick={this.addRules}>
-              Apply to {this.state.zone.name}
-            </button>
-          </div>
-        </div>
-        <div className="inline-block padding-10">
+        <div className="inline-block">
           <div>
             <h3>Blocks</h3>
-            <div>
-              {ruleItems}
+          </div>
+          <div>
+            <div className="inline-block">
+              <div>
+                <div className="padding-10 width-100">
+                  IP Addresses:
+                </div>
+                <div className="padding-10">
+                  <textarea className="padding-10 width-120 height-100"
+                            type="text"
+                            value={this.state.ipAddresses}
+                            onChange={this.handleIPAddressesChange}
+                            onBlur={this.handleIPAddressesChange}/>
+                </div>
+              </div>
+              <div>
+                <div className="padding-10 width-100">
+                  Tag:
+                </div>
+                <div className="padding-10">
+                  <input className="padding-10"
+                         type="text"
+                         value={this.state.notes}
+                         onChange={this.handleNotesChange}
+                         onBlur={this.handleNotesChange}/>
+                </div>
+              </div>
+              <div className="padding-10">
+                <button className="padding-10"
+                        onClick={this.addRules}>
+                  Apply to {this.state.zone.name}
+                </button>
+              </div>
+            </div>
+            <div className="inline-block padding-10">
+              {groupItems}
             </div>
           </div>
         </div>
+        <Spinner activeRequests={this.state.activeRequests} onComplete={this.onSpinnerComplete}></Spinner>
       </div>
-
     );
   }
 }
