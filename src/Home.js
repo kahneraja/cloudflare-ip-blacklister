@@ -146,7 +146,7 @@ class Home extends Component {
           Dump blacklisted ip addresses with a tag for any of your zones.
         </p>
         <div className="inline-block width-200 padding-10">
-          <div className="padding-10">
+          <div>
             <div>
               <h3>API</h3>
               <div className="padding-10">
@@ -183,7 +183,7 @@ class Home extends Component {
           </div>
         </div>
         <div className="inline-block padding-10">
-          <div>
+          <div className="padding-10">
             <div className="padding-10 width-100">
               IP Addresses:
             </div>
@@ -212,7 +212,7 @@ class Home extends Component {
         </div>
         <div className="inline-block padding-10">
           <div>
-            <h3>Tags</h3>
+            <h3>Blocks</h3>
             <div>
               {ruleItems}
             </div>
