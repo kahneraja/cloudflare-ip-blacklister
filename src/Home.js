@@ -6,15 +6,12 @@ import Spinner from "./Spinner";
 
 class Home extends Component {
 
-  jsonStore = new JsonStore()
+  config = new JsonStore().get('config')
 
   state = {
-    apiKey: '',
-    email: '',
-    zone: {},
-    zones: [],
     rules: [],
     ipAddresses: '',
+    notes: '',
     groups: [],
     isProcessing: false
   }
@@ -22,46 +19,15 @@ class Home extends Component {
   constructor(props) {
     super(props)
 
-    this.handleAPIKeyChange = this.handleAPIKeyChange.bind(this)
-    this.handleEmailChange = this.handleEmailChange.bind(this)
     this.handleIPAddressesChange = this.handleIPAddressesChange.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
-    this.getZones = this.getZones.bind(this)
     this.getRules = this.getRules.bind(this)
     this.addRules = this.addRules.bind(this)
     this.deleteRuleGroup = this.deleteRuleGroup.bind(this)
-    this.selectZone = this.selectZone.bind(this)
-    this.initApi = this.initApi.bind(this)
-  }
-
-  componentWillMount() {
-    this.setState({...this.jsonStore.get('config')})
   }
 
   componentDidMount() {
-    this.initApi()
-  }
-
-  initApi() {
-    let config = this.jsonStore.get('config')
-    if (config && config.email && config.apiKey){
-      this.showSpinner()
-      this.getZones()
-    }
-  }
-
-  handleAPIKeyChange(event) {
-    this.setState({
-      'apiKey': event.target.value,
-    })
-    this.jsonStore.set('config', this.state)
-  }
-
-  handleEmailChange(event) {
-    this.setState({
-      'email': event.target.value,
-    })
-    this.jsonStore.set('config', this.state)
+    this.getRules()
   }
 
   handleIPAddressesChange(event) {
@@ -76,39 +42,16 @@ class Home extends Component {
     })
   }
 
-  selectZone(zone) {
-    this.setState({
-      zoneId: zone.id
-    })
-  }
-
   reset() {
     this.setState({
-      zone: {},
-      zones: [],
       rules: [],
       groups: []
     })
   }
 
-  getZones() {
-    this.reset()
-    ApiGateway.getZones().then(response => {
-      response.json().then((data) => {
-        if (data) {
-          let zone = data[0]
-          this.setState({
-            zone: zone,
-            zones: data
-          })
-          this.getRules()
-        }
-      })
-    })
-  }
-
   getRules() {
-    ApiGateway.getRules(this.state.zone.id).then(response => {
+    this.showSpinner()
+    ApiGateway.getRules().then(response => {
       response.json().then((data) => {
         this.setState({rules: data})
         let groupSet = _.groupBy(data, (rule) => {
@@ -155,7 +98,7 @@ class Home extends Component {
       notes: notes,
       mode: 'block'
     }
-    return ApiGateway.addRule(body, this.state.zone.id)
+    return ApiGateway.addRule(body)
   }
 
   deleteRuleGroup(group) {
@@ -170,7 +113,7 @@ class Home extends Component {
   }
 
   deleteRule(rule) {
-    return ApiGateway.deleteRule(rule.id, this.state.zone.id)
+    return ApiGateway.deleteRule(rule.id)
   }
 
   showSpinner() {
@@ -182,13 +125,6 @@ class Home extends Component {
   }
 
   render() {
-    let zoneItems = this.state.zones.map((zone) =>
-      <div key={zone.id}
-           className="padding-10"
-           onClick={() => this.selectZone(zone)}>
-        {zone.name}
-      </div>
-    )
 
     let groupItems = this.state.groups.map((group, index) =>
       <div key={index}>
@@ -211,49 +147,12 @@ class Home extends Component {
       <div>
         <h2>
           <i className="fa fa-gavel padding-10"></i>
-          Cloudflare Blacklister
+          Cloudflare Blacklister: {this.config.zone.name}
         </h2>
         <p>
           Dump blacklisted ip addresses with a tag for any of your zones.
         </p>
-        <div className="inline-block width-200">
-          <div>
-            <div>
-              <h3>API</h3>
-              <div className="padding-10">
-                <input type="text"
-                       className="padding-10"
-                       value={this.state.apiKey}
-                       onChange={this.handleAPIKeyChange}
-                       onBlur={this.handleAPIKeyChange}
-                />
-              </div>
-              <div className="padding-10">
-                <div>
-                  <input type="text"
-                         className="padding-10"
-                         value={this.state.email}
-                         onChange={this.handleEmailChange}
-                         onBlur={this.handleEmailChange}
-                  />
-                </div>
-                <div>
-                  <i onClick={this.initApi}
-                     className="fa fa-refresh padding-10"
-                     aria-hidden="true"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="padding-10">
-            <div>
-              <h3>Zones</h3></div>
-            <div>
-              {zoneItems}
-            </div>
-          </div>
-        </div>
-        <div className="inline-block">
+        <div>
           <div>
             <h3>Blocks</h3>
           </div>
@@ -286,7 +185,7 @@ class Home extends Component {
               <div className="padding-10">
                 <button className="padding-10"
                         onClick={this.addRules}>
-                  Apply to {this.state.zone.name}
+                  Apply
                 </button>
               </div>
             </div>

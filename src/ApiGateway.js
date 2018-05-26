@@ -11,20 +11,18 @@ let ApiGateway = {
     })
   },
 
-  getRules: (zoneId) => {
+  getRules: () => {
     let url = `http://localhost:3000/rules`
     let headers = ApiGateway.headers()
-    headers['ZONE_ID'] = zoneId
     return fetch(url, {
       method: 'GET',
       headers: headers
     })
   },
 
-  addRule: (body, zoneId) => {
+  addRule: (body) => {
     let url = `http://localhost:3000/rules`
     let headers = ApiGateway.headers()
-    headers['ZONE_ID'] = zoneId
     return fetch(url, {
         method: 'POST',
         headers: headers,
@@ -33,10 +31,9 @@ let ApiGateway = {
     )
   },
 
-  deleteRule: (ruleId, zoneId) => {
+  deleteRule: (ruleId) => {
     let url = `http://localhost:3000/rules/${ruleId}`
     let headers = ApiGateway.headers()
-    headers['ZONE_ID'] = zoneId
     return fetch(url, {
         method: 'DELETE',
         headers: headers
@@ -46,10 +43,12 @@ let ApiGateway = {
 
   headers: () => {
     let jsonStore = new JsonStore()
+    let config = jsonStore.get('config')
     return {
       'Content-Type': 'application/json',
-      'EMAIL': jsonStore.get('config').email,
-      'KEY': jsonStore.get('config').apiKey
+      'EMAIL': config.email,
+      'KEY': config.apiKey,
+      'ZONE_ID': config.zone.id
     }
   }
 }
