@@ -4,7 +4,7 @@ class Spinner extends Component {
 
   render() {
     let show = () => {
-      if (this.props.activeRequests > 0) {
+      if (this.props.enabled) {
         return (
           <div className="full-bleed padding-left-30p padding-top-30p">
             <div className="font-size-large">

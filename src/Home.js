@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import JsonStore from "./JsonStore"
 import ApiGateway from "./ApiGateway"
 import _ from 'lodash'
+import Spinner from "./Spinner";
 
 class Home extends Component {
 
@@ -15,7 +16,7 @@ class Home extends Component {
     rules: [],
     ipAddresses: '',
     groups: [],
-    activeRequests: 0
+    isProcessing: false
   }
 
   constructor(props) {
@@ -43,8 +44,10 @@ class Home extends Component {
 
   initApi() {
     let config = this.jsonStore.get('config')
-    if (config && config.email && config.apiKey)
+    if (config && config.email && config.apiKey){
+      this.showSpinner()
       this.getZones()
+    }
   }
 
   handleAPIKeyChange(event) {
@@ -121,21 +124,26 @@ class Home extends Component {
           groups.push(group)
         })
         this.setState({groups: groups})
+        this.hideSpinner()
       })
     })
   }
 
   addRules() {
+    this.showSpinner()
     let notes = this.state.notes
     let ipAddresses = this.state.ipAddresses.split("\n")
-    ipAddresses.map((ipAddress) => {
-      this.addRule(ipAddress, notes)
+    let promises = ipAddresses.map((ipAddress) => {
+      return this.addRule(ipAddress, notes)
     })
-    this.setState({
-      'ipAddresses': '',
-      'notes': '#'
+
+    Promise.all(promises).then(() => {
+      this.setState({
+        'ipAddresses': '',
+        'notes': '#'
+      })
+      this.getRules()
     })
-    this.getRules()
   }
 
   addRule(ipAddress, notes) {
@@ -147,25 +155,30 @@ class Home extends Component {
       notes: notes,
       mode: 'block'
     }
-    ApiGateway.addRule(body, this.state.zone.id).then((response) => {
-      response.json().then(() => {
-      })
-    })
+    return ApiGateway.addRule(body, this.state.zone.id)
   }
 
   deleteRuleGroup(group) {
+    this.showSpinner()
     let rules = _.filter(this.state.rules, {notes: group.name});
-    rules.map((rule) => {
-      this.deleteRule(rule)
+    let promises = rules.map((rule) => {
+      return this.deleteRule(rule)
     })
-    this.getRules()
+    Promise.all(promises).then(() => {
+      this.getRules()
+    })
   }
 
   deleteRule(rule) {
-    ApiGateway.deleteRule(rule.id, this.state.zone.id).then((response) => {
-      response.json().then(() => {
-      })
-    })
+    return ApiGateway.deleteRule(rule.id, this.state.zone.id)
+  }
+
+  showSpinner() {
+    this.setState({'isProcessing': true})
+  }
+
+  hideSpinner() {
+    this.setState({'isProcessing': false})
   }
 
   render() {
@@ -282,6 +295,7 @@ class Home extends Component {
             </div>
           </div>
         </div>
+        <Spinner enabled={this.state.isProcessing}></Spinner>
       </div>
     );
   }
