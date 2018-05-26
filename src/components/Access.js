@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import JsonStore from "./JsonStore"
+import JsonStore from "../JsonStore"
 
 class Access extends Component {
 

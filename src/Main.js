@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
 import {Route, Switch} from "react-router-dom";
-import Home from "./Home";
-import Access from "./Access";
-import Zones from "./Zones";
-import AddRules from "./AddRules";
+import Home from "./components/Home";
+import Access from "./components/Access";
+import Zones from "./components/Zones";
+import AddRules from "./components/AddRules";
 
 class Main extends Component {
   render() {

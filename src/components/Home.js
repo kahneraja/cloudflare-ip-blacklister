@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import JsonStore from "./JsonStore"
-import ApiGateway from "./ApiGateway"
+import JsonStore from "../JsonStore"
+import ApiGateway from "../ApiGateway"
 import _ from 'lodash'
 import Spinner from "./Spinner";
 

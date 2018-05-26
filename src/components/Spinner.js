@@ -6,13 +6,12 @@ class Spinner extends Component {
     let show = () => {
       if (this.props.enabled) {
         return (
-          <div className="full-bleed padding-left-30p padding-top-30p">
+          <div className="full-bleed center">
             <div className="font-size-large">
               <div className="padding-10 inline-block">
-                <i className="fa fa-clock-o" aria-hidden="true"></i>
-              </div>
-              <div className="padding-10 inline-block">
-                loading
+                <h1>
+                  <i className="fa fa-clock-o" aria-hidden="true"></i>
+                </h1>
               </div>
             </div>
           </div>
