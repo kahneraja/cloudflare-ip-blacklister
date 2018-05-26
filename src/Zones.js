@@ -35,7 +35,7 @@ class Zones extends Component {
     let config = jsonStore.get('config')
     config.zone = zone
     jsonStore.set('config', config)
-    this.props.history.push("/");
+    this.props.history.push("/")
   }
 
   render() {

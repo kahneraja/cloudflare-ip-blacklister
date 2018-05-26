@@ -10,8 +10,6 @@ class Home extends Component {
 
   state = {
     rules: [],
-    ipAddresses: '',
-    notes: '',
     groups: [],
     isProcessing: false
   }
@@ -22,8 +20,8 @@ class Home extends Component {
     this.handleIPAddressesChange = this.handleIPAddressesChange.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
     this.getRules = this.getRules.bind(this)
-    this.addRules = this.addRules.bind(this)
     this.deleteRuleGroup = this.deleteRuleGroup.bind(this)
+    this.addRules = this.addRules.bind(this)
   }
 
   componentDidMount() {
@@ -49,6 +47,10 @@ class Home extends Component {
     })
   }
 
+  addRules() {
+    this.props.history.push("/add-rules")
+  }
+
   getRules() {
     this.showSpinner()
     ApiGateway.getRules().then(response => {
@@ -70,35 +72,6 @@ class Home extends Component {
         this.hideSpinner()
       })
     })
-  }
-
-  addRules() {
-    this.showSpinner()
-    let notes = this.state.notes
-    let ipAddresses = this.state.ipAddresses.split("\n")
-    let promises = ipAddresses.map((ipAddress) => {
-      return this.addRule(ipAddress, notes)
-    })
-
-    Promise.all(promises).then(() => {
-      this.setState({
-        'ipAddresses': '',
-        'notes': '#'
-      })
-      this.getRules()
-    })
-  }
-
-  addRule(ipAddress, notes) {
-    let body = {
-      configuration: {
-        target: 'ip',
-        value: ipAddress
-      },
-      notes: notes,
-      mode: 'block'
-    }
-    return ApiGateway.addRule(body)
   }
 
   deleteRuleGroup(group) {
@@ -128,7 +101,7 @@ class Home extends Component {
 
     let groupItems = this.state.groups.map((group, index) =>
       <div key={index}>
-        <div className="padding-2 margin-2 inline-block width-100">
+        <div className="padding-2 margin-2 inline-block width-200">
           {group.name}
         </div>
         <div
@@ -154,45 +127,20 @@ class Home extends Component {
         </p>
         <div>
           <div>
-            <h3>Blocks</h3>
+            <div className="inline-block">
+              <h3>Blocks</h3>
+            </div>
           </div>
           <div>
-            <div className="inline-block">
-              <div>
-                <div className="padding-10 width-100">
-                  IP Addresses:
-                </div>
-                <div className="padding-10">
-                  <textarea className="padding-10 width-120 height-100"
-                            type="text"
-                            value={this.state.ipAddresses}
-                            onChange={this.handleIPAddressesChange}
-                            onBlur={this.handleIPAddressesChange}/>
-                </div>
-              </div>
-              <div>
-                <div className="padding-10 width-100">
-                  Tag:
-                </div>
-                <div className="padding-10">
-                  <input className="padding-10"
-                         type="text"
-                         value={this.state.notes}
-                         onChange={this.handleNotesChange}
-                         onBlur={this.handleNotesChange}/>
-                </div>
-              </div>
-              <div className="padding-10">
-                <button className="padding-10"
-                        onClick={this.addRules}>
-                  Apply
-                </button>
-              </div>
-            </div>
             <div className="inline-block padding-10">
               {groupItems}
             </div>
           </div>
+        </div>
+        <div className="padding-10">
+          <i onClick={this.addRules}
+             className="fa fa-plus-circle fa-large cursor-pointer"
+             aria-hidden="true"></i>
         </div>
         <Spinner enabled={this.state.isProcessing}></Spinner>
       </div>
