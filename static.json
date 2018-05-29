@@ -1,7 +1,7 @@
 {
-  "proxies": {
-    "/api/": {
-      "origin": "https://cloudflare-api.herokuapp.com/api"
+  "headers": {
+    "/": {
+      "Access-Control-Allow-Origin": "cloudflare-api.herokuapp.com"
     }
   }
 }
