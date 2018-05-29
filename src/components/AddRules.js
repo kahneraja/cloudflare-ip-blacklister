@@ -35,10 +35,12 @@ class Home extends Component {
 
   addRules() {
     this.showSpinner()
-    let notes = this.state.notes
-    let ipAddresses = this.state.ipAddresses.split("\n")
-    let promises = ipAddresses.map((ipAddress) => {
-      return this.addRule(ipAddress, notes)
+    const notes = this.state.notes
+    const ipAddresses = this.state.ipAddresses.split("\n")
+    const throttle = parseInt(process.env.REACT_APP_API_THROTTLE)
+    let promises = ipAddresses.map((ipAddress, index) => {
+      const delay = throttle * index
+      return new Promise(resolve => setTimeout(resolve, delay)).then(() => this.addRule(ipAddress, notes))
     })
 
     Promise.all(promises).then(() => {

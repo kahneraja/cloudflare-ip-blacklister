@@ -85,9 +85,11 @@ class Home extends Component {
 
   deleteRuleGroup(group) {
     this.showSpinner()
-    let rules = _.filter(this.state.rules, {notes: group.name});
-    let promises = rules.map((rule) => {
-      return this.deleteRule(rule)
+    const rules = _.filter(this.state.rules, {notes: group.name});
+    const throttle = parseInt(process.env.REACT_APP_API_THROTTLE)
+    let promises = rules.map((rule, index) => {
+      const delay = throttle * index
+      return new Promise(resolve => setTimeout(resolve, delay)).then(() => this.deleteRule(rule))
     })
     Promise.all(promises).then(() => {
       this.getRules()
@@ -106,8 +108,11 @@ class Home extends Component {
     this.setState({'isProcessing': false})
   }
 
-  onConfirmComplete() {}
-  onConfirmCancel() {}
+  onConfirmComplete() {
+  }
+
+  onConfirmCancel() {
+  }
 
   render() {
     if (!this.config)
