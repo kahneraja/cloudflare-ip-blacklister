@@ -1,10 +1,7 @@
 {
-  "root": "dist/",
-  "https_only": true,
-  "headers": {
-    "/": {
-      "Cache-Control": "no-store, no-cache"
-      "Access-Control-Allow-Origin": "cloudflare-api.herokuapp.com"
+  "proxies": {
+    "/api/": {
+      "origin": "https://cloudflare-api.herokuapp.com/api"
     }
   }
 }
