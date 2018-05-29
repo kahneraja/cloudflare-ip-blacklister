@@ -3,7 +3,6 @@ import JsonStore from "../JsonStore"
 import ApiGateway from "../ApiGateway"
 import _ from 'lodash'
 import Spinner from "./Spinner";
-import ConfirmPrompt from "./ConfirmPrompt";
 
 class Home extends Component {
 
@@ -158,7 +157,6 @@ class Home extends Component {
              aria-hidden="true"></i>
         </div>
         <Spinner enabled={this.state.isProcessing}></Spinner>
-        <ConfirmPrompt enabled={this.state.isConfirming} onComplete={this.onConfirmComplete} onCancel={this.onConfirmCancel}></ConfirmPrompt>
       </div>
     );
   }
