@@ -1,7 +1,10 @@
 {
-  "proxies": {
-    "/api/": {
-      "origin": "https://${REACT_APP_HOST_API}/"
+  "root": "dist/",
+  "https_only": true,
+  "headers": {
+    "/": {
+      "Cache-Control": "no-store, no-cache"
+      "Access-Control-Allow-Origin": "cloudflare-api.herokuapp.com"
     }
   }
 }
