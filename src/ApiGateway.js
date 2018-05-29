@@ -3,7 +3,7 @@ import JsonStore from "./JsonStore";
 let ApiGateway = {
 
   getAccounts: () => {
-    let url = `${process.env.REACT_APP_HOST_API}/accounts`
+    let url = `${process.env.REACT_APP_HOST_API}/api/accounts`
     let headers = ApiGateway.headers()
     return fetch(url, {
       method: 'GET',
@@ -12,7 +12,7 @@ let ApiGateway = {
   },
 
   getZones: () => {
-    let url = `${process.env.REACT_APP_HOST_API}/zones`
+    let url = `${process.env.REACT_APP_HOST_API}/api/zones`
     let headers = ApiGateway.headers()
     return fetch(url, {
       method: 'GET',
@@ -21,7 +21,7 @@ let ApiGateway = {
   },
 
   getRules: () => {
-    let url = `${process.env.REACT_APP_HOST_API}/rules`
+    let url = `${process.env.REACT_APP_HOST_API}/api/rules`
     let headers = ApiGateway.headers()
     return fetch(url, {
       method: 'GET',
@@ -30,7 +30,7 @@ let ApiGateway = {
   },
 
   addRule: (body) => {
-    let url = `${process.env.REACT_APP_HOST_API}/rules`
+    let url = `${process.env.REACT_APP_HOST_API}/api/rules`
     let headers = ApiGateway.headers()
     return fetch(url, {
         method: 'POST',
@@ -41,7 +41,7 @@ let ApiGateway = {
   },
 
   deleteRule: (ruleId) => {
-    let url = `${process.env.REACT_APP_HOST_API}/rules/${ruleId}`
+    let url = `${process.env.REACT_APP_HOST_API}/api/rules/${ruleId}`
     let headers = ApiGateway.headers()
     return fetch(url, {
         method: 'DELETE',
