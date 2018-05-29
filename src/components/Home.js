@@ -134,10 +134,10 @@ class Home extends Component {
       <div className="padding-10">
         <h2>
           <i className="fa fa-gavel padding-10"></i>
-          Cloudflare Blacklister: {this.config.zone.name}
+          Cloudflare Blacklister: {this.config.account.name}
         </h2>
         <p>
-          Dump blacklisted ip addresses with a tag for any of your zones.
+          Blocking ips by cloudflare accounts.
         </p>
         <div>
           <div>

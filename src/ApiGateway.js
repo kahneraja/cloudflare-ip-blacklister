@@ -2,8 +2,17 @@ import JsonStore from "./JsonStore";
 
 let ApiGateway = {
 
+  getAccounts: () => {
+    let url = `${process.env.REACT_APP_HOST_API}/accounts`
+    let headers = ApiGateway.headers()
+    return fetch(url, {
+      method: 'GET',
+      headers: headers
+    })
+  },
+
   getZones: () => {
-    let url = 'http://localhost:3000/zones'
+    let url = `${process.env.REACT_APP_HOST_API}/zones`
     let headers = ApiGateway.headers()
     return fetch(url, {
       method: 'GET',
@@ -12,7 +21,7 @@ let ApiGateway = {
   },
 
   getRules: () => {
-    let url = `http://localhost:3000/rules`
+    let url = `${process.env.REACT_APP_HOST_API}/rules`
     let headers = ApiGateway.headers()
     return fetch(url, {
       method: 'GET',
@@ -21,7 +30,7 @@ let ApiGateway = {
   },
 
   addRule: (body) => {
-    let url = `http://localhost:3000/rules`
+    let url = `${process.env.REACT_APP_HOST_API}/rules`
     let headers = ApiGateway.headers()
     return fetch(url, {
         method: 'POST',
@@ -32,7 +41,7 @@ let ApiGateway = {
   },
 
   deleteRule: (ruleId) => {
-    let url = `http://localhost:3000/rules/${ruleId}`
+    let url = `${process.env.REACT_APP_HOST_API}/rules/${ruleId}`
     let headers = ApiGateway.headers()
     return fetch(url, {
         method: 'DELETE',
@@ -51,8 +60,8 @@ let ApiGateway = {
       'KEY': config.apiKey
     }
 
-    if (config.zone)
-      headers['ZONE_ID'] = config.zone.id
+    if (config.account)
+      headers['ACCOUNT_ID'] = config.account.id
 
     return headers
   }

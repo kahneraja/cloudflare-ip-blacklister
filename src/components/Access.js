@@ -19,7 +19,7 @@ class Access extends Component {
   next() {
     let jsonStore = new JsonStore()
     jsonStore.set('config', this.state)
-    this.props.history.push("zones");
+    this.props.history.push("accounts");
   }
 
   handleAPIKeyChange(event) {
