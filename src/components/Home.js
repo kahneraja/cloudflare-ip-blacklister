@@ -3,6 +3,7 @@ import JsonStore from "../JsonStore"
 import ApiGateway from "../ApiGateway"
 import _ from 'lodash'
 import Spinner from "./Spinner";
+import ConfirmPrompt from "./ConfirmPrompt";
 
 class Home extends Component {
 
@@ -11,7 +12,8 @@ class Home extends Component {
   state = {
     rules: [],
     groups: [],
-    isProcessing: false
+    isProcessing: false,
+    isConfirming: true
   }
 
   constructor(props) {
@@ -22,6 +24,14 @@ class Home extends Component {
     this.getRules = this.getRules.bind(this)
     this.deleteRuleGroup = this.deleteRuleGroup.bind(this)
     this.addRules = this.addRules.bind(this)
+    this.onConfirmCancel = this.onConfirmCancel.bind(this)
+    this.onConfirmComplete = this.onConfirmComplete.bind(this)
+  }
+
+  componentWillMount() {
+    if (!this.config) {
+      return this.props.history.push("/Access")
+    }
   }
 
   componentDidMount() {
@@ -97,7 +107,12 @@ class Home extends Component {
     this.setState({'isProcessing': false})
   }
 
+  onConfirmComplete() {}
+  onConfirmCancel() {}
+
   render() {
+    if (!this.config)
+      return ('')
 
     let groupItems = this.state.groups.map((group, index) =>
       <div key={index}>
@@ -117,7 +132,7 @@ class Home extends Component {
     )
 
     return (
-      <div>
+      <div className="padding-10">
         <h2>
           <i className="fa fa-gavel padding-10"></i>
           Cloudflare Blacklister: {this.config.zone.name}
@@ -143,6 +158,7 @@ class Home extends Component {
              aria-hidden="true"></i>
         </div>
         <Spinner enabled={this.state.isProcessing}></Spinner>
+        <ConfirmPrompt enabled={this.state.isConfirming} onComplete={this.onConfirmComplete} onCancel={this.onConfirmCancel}></ConfirmPrompt>
       </div>
     );
   }

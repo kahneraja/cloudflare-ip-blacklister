@@ -44,12 +44,17 @@ let ApiGateway = {
   headers: () => {
     let jsonStore = new JsonStore()
     let config = jsonStore.get('config')
-    return {
+
+    let headers = {
       'Content-Type': 'application/json',
       'EMAIL': config.email,
-      'KEY': config.apiKey,
-      'ZONE_ID': config.zone.id
+      'KEY': config.apiKey
     }
+
+    if (config.zone)
+      headers['ZONE_ID'] = config.zone.id
+
+    return headers
   }
 }
 

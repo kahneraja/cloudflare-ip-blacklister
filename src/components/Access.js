@@ -37,7 +37,7 @@ class Access extends Component {
 
   render() {
     return (
-      <div>
+      <div className="padding-10">
         <h2>
           <i className="fa fa-gavel padding-10"></i>
           Cloudflare Blacklister: Access

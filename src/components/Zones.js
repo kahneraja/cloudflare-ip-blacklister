@@ -39,7 +39,6 @@ class Zones extends Component {
   }
 
   render() {
-
     let zoneItems = this.state.zones.map((zone) =>
       <div key={zone.id}>
         <div className="inline-block padding-10">
@@ -57,7 +56,7 @@ class Zones extends Component {
     )
 
     return (
-      <div>
+      <div className="padding-10">
         <h2>
           <i className="fa fa-gavel padding-10"></i>
           Cloudflare Blacklister: Zones

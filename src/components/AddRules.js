@@ -42,7 +42,7 @@ class Home extends Component {
     })
 
     Promise.all(promises).then(() => {
-      this.props.history.push("/");
+      this.props.history.push("/")
     })
   }
 
@@ -64,7 +64,7 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
+      <div className="padding-10">
         <h2>
           <i className="fa fa-gavel padding-10"></i>
           Cloudflare Blacklister: {this.config.zone.name}
